@@ -16,7 +16,7 @@ import {assert} from 'chai';
 import * as path from 'path';
 
 import {Analyzer} from '../core/analyzer';
-import {Cancel} from '../core/cancel-token';
+import {isCancel} from '../core/cancel-token';
 import {FileRelativeUrl, PackageRelativeUrl, ParsedDocument, ResolvedUrl, ScannedFeature, UrlResolver} from '../index';
 import {makeParseLoader, SourceRange, Warning} from '../model/model';
 import {scan} from '../scanning/scan';
@@ -162,5 +162,5 @@ export function resolvedUrl(
 export const fixtureDir = path.join(__dirname, '../../src/test/static');
 export async function assertIsCancelled(promise: Promise<any>): Promise<void> {
   const rejection = await invertPromise(promise);
-  assert.instanceOf(rejection, Cancel);
+  assert.isTrue(isCancel(rejection), `Expected ${rejection} to be a Cancel.`);
 }
