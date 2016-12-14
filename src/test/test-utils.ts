@@ -12,8 +12,11 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import {assert} from 'chai';
 import * as path from 'path';
+
 import {Analyzer} from '../core/analyzer';
+import {Cancel} from '../core/cancel-token';
 import {FileRelativeUrl, PackageRelativeUrl, ParsedDocument, ResolvedUrl, ScannedFeature, UrlResolver} from '../index';
 import {makeParseLoader, SourceRange, Warning} from '../model/model';
 import {scan} from '../scanning/scan';
@@ -21,7 +24,6 @@ import {Scanner} from '../scanning/scanner';
 import {InMemoryOverlayUrlLoader} from '../url-loader/overlay-loader';
 import {UrlLoader} from '../url-loader/url-loader';
 import {underlineCode} from '../warning/code-printer';
-
 
 export class UnexpectedResolutionError extends Error {
   resolvedValue: any;
@@ -158,3 +160,7 @@ export function resolvedUrl(
 }
 
 export const fixtureDir = path.join(__dirname, '../../src/test/static');
+export async function assertIsCancelled(promise: Promise<any>): Promise<void> {
+  const rejection = await invertPromise(promise);
+  assert.instanceOf(rejection, Cancel);
+}
