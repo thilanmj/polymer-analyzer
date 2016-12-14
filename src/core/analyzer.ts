@@ -26,6 +26,7 @@ import {UrlLoader} from '../url-loader/url-loader';
 import {UrlResolver} from '../url-loader/url-resolver';
 
 import {AnalysisContext} from './analysis-context';
+import {MinimalCancelToken, neverCancels} from './cancel-token';
 
 export interface Options {
   urlLoader: UrlLoader;
@@ -97,19 +98,21 @@ export class Analyzer {
    * Loads, parses and analyzes the root document of a dependency graph and its
    * transitive dependencies.
    */
-  async analyze(urls: string[]): Promise<Analysis> {
+  async analyze(urls: string[], cancelToken: MinimalCancelToken = neverCancels):
+      Promise<Analysis> {
     const previousAnalysisComplete = this._analysisComplete;
     const uiUrls = this.brandUserInputUrls(urls);
     this._analysisComplete = (async () => {
       const previousContext = await previousAnalysisComplete;
-      return await previousContext.analyze(uiUrls);
+      return await previousContext.analyze(uiUrls, cancelToken);
     })();
     const context = await this._analysisComplete;
     const resolvedUrls = context.resolveUserInputUrls(uiUrls);
     return this._constructAnalysis(context, resolvedUrls);
   }
 
-  async analyzePackage(): Promise<Analysis> {
+  async analyzePackage(cancelToken: MinimalCancelToken = neverCancels):
+      Promise<Analysis> {
     const previousAnalysisComplete = this._analysisComplete;
     let analysis: Analysis;
     this._analysisComplete = (async () => {
@@ -128,7 +131,8 @@ export class Analyzer {
       const filesWithParsers = filesInPackage.filter(
           (fn) => extensions.has(path.extname(fn).substring(1)));
 
-      const newContext = await previousContext.analyze(filesWithParsers);
+      const newContext =
+          await previousContext.analyze(filesWithParsers, cancelToken);
       const resolvedFilesWithParsers =
           newContext.resolveUserInputUrls(filesWithParsers);
       analysis = this._constructAnalysis(newContext, resolvedFilesWithParsers);

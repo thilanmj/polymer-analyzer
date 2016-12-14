@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 * Add `Element#template` for getting the template of an element.
+* Add the ability to cancel an analysis by passing in a CancelToken, which can
+  signal that the request has been cancelled. This can be useful in saving work
+  if you know that the result of the analysis won't be used.
 <!-- Add new, unreleased changes here. -->
 
 ## [3.0.0-pre.7] - 2017-01-01
@@ -355,7 +358,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 * Fix a class of race conditions and cache invalidation errors that can occur when there are concurrent analysis runs and edits to files.
-
 
 ## [2.0.0-alpha.19] - 2016-12-12
 

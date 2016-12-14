@@ -41,6 +41,7 @@ import {PackageUrlResolver} from '../../url-loader/package-url-resolver';
 import {AnalysisContext} from '../../core/analysis-context';
 import {HtmlScanner} from '../../html/html-scanner';
 import {ScannedFeature} from '../../index';
+import {neverCancels} from '../../core/cancel-token';
 
 use(chaiSubset);
 use(chaiAsPromised);
@@ -584,7 +585,7 @@ suite('Analyzer', () => {
     test('loads and parses an HTML document', async () => {
       const context = await getContext(analyzer);
       const doc = await context['_parse'](
-          analyzer.resolveUrl(`static/html-parse-target.html`)!);
+          analyzer.resolveUrl(`static/html-parse-target.html`)!, neverCancels);
       assert.instanceOf(doc, ParsedHtmlDocument);
       assert.equal(
           doc.url, analyzer.resolveUrl(`static/html-parse-target.html`)!);
@@ -593,15 +594,15 @@ suite('Analyzer', () => {
     test('loads and parses a JavaScript document', async () => {
       const context = await getContext(analyzer);
       const doc = await context['_parse'](
-          analyzer.resolveUrl(`static/js-elements.js`)!);
+          analyzer.resolveUrl(`static/js-elements.js`)!, neverCancels);
       assert.instanceOf(doc, JavaScriptDocument);
       assert.equal(doc.url, analyzer.resolveUrl(`static/js-elements.js`));
     });
 
     test('returns a Promise that rejects for non-existant files', async () => {
       const context = await getContext(analyzer);
-      await invertPromise(
-          context['_parse'](analyzer.resolveUrl(`static/not-found`)!));
+      await invertPromise(context['_parse'](
+          analyzer.resolveUrl(`static/not-found`)!, neverCancels));
     });
   });
 
